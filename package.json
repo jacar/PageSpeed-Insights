@@ -1,16 +1,13 @@
 {
-  "name": "pagespeed-app",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "axios": "^1.7.7",
-    "express": "^4.21.0"
-  }
+    "name": "webcincos-projects",
+    "version": "1.0.0",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "@vercel/speed-insights": "^1.0.12",
+        "axios": "^0.21.1",
+        "express": "^4.17.1"
+    }
 }

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PageSpeed Insights</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #4a4a4a; /* Fondo gris oscuro */
+            color: #fff; /* Texto blanco */
+            overflow: hidden; /* Oculta el scroll */
+        }
+        .header-hero {
+            background: #007bff; /* Azul brillante */
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .header-hero h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .header-hero p {
+            font-size: 1.2em;
+            margin: 10px 0 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100vw;
+            height: calc(100vh - 120px); /* Ajusta el alto para que quede debajo del header */
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            color: #333; /* Texto en el input */
+        }
+        .input-group button {
+            padding: 10px;
+            border: none;
+            background: #007bff; /* Botón azul */
+            color: #fff; /* Texto del botón blanco */
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .input-group button:hover {
+            background: #0056b3; /* Botón azul oscuro al pasar el ratón */
+        }
+        .loading-bar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .loading-bar span {
+            display: block;
+            height: 100%;
+            background: #007bff; /* Azul para la barra de carga */
+            border-radius: 5px;
+            width: 0%;
+            transition: width 2s; /* Barra de carga más lenta */
+        }
+        .loading-bar span.loading {
+            width: 100%;
+            animation: loadingAnimation 2s forwards;
+        }
+        @keyframes loadingAnimation {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        .metric-category {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            max-width: 800px;
+            width: 100%;
+            justify-content: center;
+        }
+        .metric-icon {
+            font-size: 2em;
+            color: #007bff;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .metric-icon:hover {
+            transform: scale(1.2);
+        }
+        .metric-icon.active {
+            border: 2px solid #007bff;
+            border-radius: 50%;
+            padding: 10px;
+        }
+        .results {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+        .result-card {
+            background: #333; /* Fondo gris oscuro para las tarjetas */
+            border: 1px solid #555; /* Borde gris oscuro */
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        .result-card h3 {
+            margin-top: 0;
+            color: #fff; /* Texto blanco en los títulos */
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .metric-name {
+            flex: 1;
+            font-weight: bold;
+        }
+        .metric-bar {
+            flex: 2;
+            height: 20px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .metric-bar div {
+            height: 100%;
+            text-align: right;
+            line-height: 20px;
+            color: #fff;
+            padding-right: 10px;
+            box-sizing: border-box;
+            font-weight: bold;
+        }
+        .metric-bar.good {
+            background: #4caf50; /* Verde para bueno */
+        }
+        .metric-bar.medium {
+            background: #ff9800; /* Naranja para regular */
+        }
+        .metric-bar.poor {
+            background: #f44336; /* Rojo para malo */
+        }
+        .metric-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0,0,0,0.1); /* Sombra ligera */
+        }
+        .metric-bar span {
+            position: absolute;
+            right: 10px;
+        }
+        .footer-buttons {
+            margin-top: 20px;
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-buttons button {
+            padding: 10px;
+            border: none;
+            background: #007bff; /* Botón azul */
+            color: #fff; /* Texto del botón blanco */
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+            margin: 0 10px;
+        }
+        .footer-buttons button:hover {
+            background: #0056b3; /* Botón azul oscuro al pasar el ratón */
+        }
+        .metrics-circles {
+            display: flex;
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .metric-circle {
+            width: 100px;
+            height: 100px;
+            background: #333; /* Fondo gris oscuro para los círculos */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metric-circle svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .metric-circle span {
+            color: #fff; /* Texto blanco */
+            font-size: 1.5em;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+        .metric-circle .metric-label {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.9em;
+            color: #ccc;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-hero">
+        <h1>PageSpeed Insights</h1>
+        <p>Mejora el rendimiento de tu sitio web con nuestras métricas detalladas para móvil y escritorio.</p>
+    </div>
+    <div class="container">
+        <div class="input-group">
+            <input type="text" id="url-input" placeholder="Ingrese la URL..." />
+            <button id="check-button">Verificar</button>
+        </div>
+        <div class="loading-bar"><span id="loading-bar"></span></div>
+        <div class="metric-category">
+            <i class="fa fa-mobile metric-icon active" id="mobile-icon" aria-hidden="true"></i>
+            <i class="fa fa-desktop metric-icon" id="desktop-icon" aria-hidden="true"></i>
+        </div>
+        <div class="metrics-circles" id="metrics-circles">
+            <!-- Sección para las métricas de rendimiento, accesibilidad, etc. -->
+        </div>
+        <div class="results" id="results">
+            <!-- Sección para los resultados de rendimiento móvil y escritorio -->
+        </div>
+        <div class="footer-buttons">
+            <button id="mobile-button">Móvil</button>
+            <button id="desktop-button">Escritorio</button>
+        </div>
+    </div>
+    <script>
+        document.getElementById('check-button').addEventListener('click', async () => {
+            const url = document.getElementById('url-input').value;
+            const loadingBar = document.getElementById('loading-bar');
+            loadingBar.classList.add('loading');
+
+            if (!url) {
+                alert('Por favor, ingrese una URL.');
+                loadingBar.classList.remove('loading');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/pagespeed?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                loadingBar.classList.remove('loading');
+
+                if (data && data.loadingExperience && data.originLoadingExperience) {
+                    const { loadingExperience, originLoadingExperience } = data;
+
+                    // Métricas de rendimiento
+                    const mobileMetrics = `
+                        <div class="result-card">
+                            <h3>Rendimiento en Móvil</h3>
+                            <div class="metric">
+                                <span class="metric-name">Cambio de Diseño Acumulativo</span>
+                                ${formatMetric(loadingExperience.metrics.CUMULATIVE_LAYOUT_SHIFT_SCORE.percentile, { good: 0, medium: 0.1 })}
+                            </div>
+                            <div class="metric">
+                                <span class="metric-name">Primer Pintado con Contenido</span>
+                                ${formatMetric(loadingExperience.metrics.FIRST_CONTENTFUL_PAINT_MS.percentile, { good: 1800, medium: 3000 })}
+                            </div>
+                            <div class="metric">
+                                <span class="metric-name">Mayor Pintado con Contenido</span>
+                                ${formatMetric(loadingExperience.metrics.LARGEST_CONTENTFUL_PAINT_MS.percentile, { good: 2500, medium: 4000 })}
+                            </div>
+                        </div>
+                    `;
+
+                    const desktopMetrics = `
+                        <div class="result-card">
+                            <h3>Rendimiento en Escritorio</h3>
+                            <div class="metric">
+                                <span class="metric-name">Cambio de Diseño Acumulativo</span>
+                                ${formatMetric(originLoadingExperience.metrics.CUMULATIVE_LAYOUT_SHIFT_SCORE.percentile, { good: 0, medium: 0.1 })}
+                            </div>
+                            <div class="metric">
+                                <span class="metric-name">Primer Pintado con Contenido</span>
+                                ${formatMetric(originLoadingExperience.metrics.FIRST_CONTENTFUL_PAINT_MS.percentile, { good: 1800, medium: 3000 })}
+                            </div>
+                            <div class="metric">
+                                <span class="metric-name">Mayor Pintado con Contenido</span>
+                                ${formatMetric(originLoadingExperience.metrics.LARGEST_CONTENTFUL_PAINT_MS.percentile, { good: 2500, medium: 4000 })}
+                            </div>
+                        </div>
+                    `;
+
+                    // Métricas generales
+                    const metricsCircles = `
+                        <div class="metric-circle" style="--score: ${data.performanceScore}; --color: ${getColor(data.performanceScore)};">
+                            <svg>
+                                <circle cx="50" cy="50" r="45" stroke="${getColor(data.performanceScore)}" stroke-width="10" fill="none"/>
+                                <circle cx="50" cy="50" r="45" stroke="#fff" stroke-width="10" stroke-dasharray="${data.performanceScore} 100" stroke-dashoffset="25" fill="none"/>
+                            </svg>
+                            <span>${data.performanceScore || 'N/A'}</span>
+                            <div class="metric-label">Rendimiento</div>
+                        </div>
+                        <div class="metric-circle" style="--score: ${data.accessibilityScore}; --color: ${getColor(data.accessibilityScore)};">
+                            <svg>
+                                <circle cx="50" cy="50" r="45" stroke="${getColor(data.accessibilityScore)}" stroke-width="10" fill="none"/>
+                                <circle cx="50" cy="50" r="45" stroke="#fff" stroke-width="10" stroke-dasharray="${data.accessibilityScore} 100" stroke-dashoffset="25" fill="none"/>
+                            </svg>
+                            <span>${data.accessibilityScore || 'N/A'}</span>
+                            <div class="metric-label">Accesibilidad</div>
+                        </div>
+                        <div class="metric-circle" style="--score: ${data.bestPracticesScore}; --color: ${getColor(data.bestPracticesScore)};">
+                            <svg>
+                                <circle cx="50" cy="50" r="45" stroke="${getColor(data.bestPracticesScore)}" stroke-width="10" fill="none"/>
+                                <circle cx="50" cy="50" r="45" stroke="#fff" stroke-width="10" stroke-dasharray="${data.bestPracticesScore} 100" stroke-dashoffset="25" fill="none"/>
+                            </svg>
+                            <span>${data.bestPracticesScore || 'N/A'}</span>
+                            <div class="metric-label">Prácticas Recomendadas</div>
+                        </div>
+                        <div class="metric-circle" style="--score: ${data.seoScore}; --color: ${getColor(data.seoScore)};">
+                            <svg>
+                                <circle cx="50" cy="50" r="45" stroke="${getColor(data.seoScore)}" stroke-width="10" fill="none"/>
+                                <circle cx="50" cy="50" r="45" stroke="#fff" stroke-width="10" stroke-dasharray="${data.seoScore} 100" stroke-dashoffset="25" fill="none"/>
+                            </svg>
+                            <span>${data.seoScore || 'N/A'}</span>
+                            <div class="metric-label">SEO</div>
+                        </div>
+                    `;
+
+                    function showMetrics(metrics) {
+                        document.getElementById('results').innerHTML = metrics;
+                    }
+
+                    document.getElementById('mobile-icon').addEventListener('click', function() {
+                        document.getElementById('mobile-icon').classList.add('active');
+                        document.getElementById('desktop-icon').classList.remove('active');
+                        showMetrics(mobileMetrics);
+                    });
+
+                    document.getElementById('desktop-icon').addEventListener('click', function() {
+                        document.getElementById('desktop-icon').classList.add('active');
+                        document.getElementById('mobile-icon').classList.remove('active');
+                        showMetrics(desktopMetrics);
+                    });
+
+                    document.getElementById('mobile-button').addEventListener('click', function() {
+                        showMetrics(mobileMetrics);
+                    });
+
+                    document.getElementById('desktop-button').addEventListener('click', function() {
+                        showMetrics(desktopMetrics);
+                    });
+
+                    document.getElementById('metrics-circles').innerHTML = metricsCircles;
+                    showMetrics(mobileMetrics); // Mostrar resultados móviles por defecto
+                } else {
+                    document.getElementById('results').innerHTML = `
+                        <div class="result-card">
+                            <h3>Ocurrió un error al obtener los datos.</h3>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('loading-bar').classList.remove('loading');
+                document.getElementById('results').innerHTML = `
+                    <div class="result-card">
+                        <h3>Ocurrió un error al obtener los datos.</h3>
+                    </div>
+                `;
+            }
+        });
+
+        function formatMetric(value, thresholds) {
+            let category;
+            if (value <= thresholds.good) {
+                category = 'good';
+            } else if (value <= thresholds.medium) {
+                category = 'medium';
+            } else {
+                category = 'poor';
+            }
+            return `
+                <div class="metric-bar ${category}">
+                    <span>${value} ms</span>
+                </div>
+            `;
+        }
+
+        function getColor(score) {
+            if (score >= 85) return '#4caf50'; // Verde para bueno
+            if (score >= 50) return '#ff9800'; // Naranja para regular
+            return '#f44336'; // Rojo para malo
+        }
+    </script>
+</body>
+</html>
